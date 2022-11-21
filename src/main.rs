@@ -54,6 +54,7 @@ fn min(one: f32,two: f32) -> f32{
 } 
 #[macroquad::main("Map Gen")]
 async fn main() { 
+    println!("run", );
     // let mut map = DelaunayTriangulation::new();
     // map.gen_edges();
     // let seed = Some(323_542_654_652_395_721);
@@ -61,7 +62,7 @@ async fn main() {
     let mut rng = rand::thread_rng();
     let mut seed = rng.gen_range(0..i64::MAX);
     let mut noise_generator = OpenSimplexNoise::new(Some(seed));
-    let scale = 0.04;
+    let mut scale = 0.01;
     let mut all_elevations: Vec<Vec<f32>> = Vec::new();
     let mut value_island = 100.;
     for y in 0..screen_height() as u32 {
@@ -111,6 +112,56 @@ async fn main() {
                     
                 }
             }
+        }
+        if is_key_down(KeyCode::U) {
+            scale *=2.;
+            draw_text("Please Wait While Map is created",250.,100., 30., BLACK);
+            noise_generator = OpenSimplexNoise::new(Some(seed));
+            all_elevations = Vec::new();
+            for y in 0..screen_height() as u32 {
+                let mut v1: Vec<f32> = Vec::new();
+                for x in 0..screen_width() as u32 {
+                    let nx = 2.*x as f32/screen_width() -1.;
+                    let ny = 2.*y as f32/screen_height() -1.;
+                    let d = min(1.,(nx.powf(2.)+ny.powf(2.))/(2. as f32).sqrt()) * value_island;
+                    v1.push(
+                        (1.*noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                    + 0.5* noise_generator.eval_2d((x as f64 * scale) * 2., (y as f64 * scale)*2.) as f32
+                    + 0.5* noise_generator.eval_2d((y as f64 * scale)*2.,(x as f64 * scale) * 2.) as f32  
+                    + 2.* noise_generator.eval_2d((x as f64 * scale) * 1./2., (y as f64 * scale)*1./2.) as f32   
+                    + 0.25 * noise_generator.eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.) as f32
+                    + 0.1 * noise_generator.eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.) as f32).powf(2.).powf(0.5).powf(0.9) - 0.04 + (1.-d)/2.
+                    );
+                    // println!("{}", v1[v1.len()-1]);
+                }
+                all_elevations.push(v1);
+            }
+    
+        }
+        if is_key_down(KeyCode::Y) {
+            scale /=2.;
+            draw_text("Please Wait While Map is created",250.,100., 30., BLACK);
+            noise_generator = OpenSimplexNoise::new(Some(seed));
+            all_elevations = Vec::new();
+            for y in 0..screen_height() as u32 {
+                let mut v1: Vec<f32> = Vec::new();
+                for x in 0..screen_width() as u32 {
+                    let nx = 2.*x as f32/screen_width() -1.;
+                    let ny = 2.*y as f32/screen_height() -1.;
+                    let d = min(1.,(nx.powf(2.)+ny.powf(2.))/(2. as f32).sqrt()) * value_island;
+                    v1.push(
+                        (1.*noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                    + 0.5* noise_generator.eval_2d((x as f64 * scale) * 2., (y as f64 * scale)*2.) as f32
+                    + 0.5* noise_generator.eval_2d((y as f64 * scale)*2.,(x as f64 * scale) * 2.) as f32  
+                    + 2.* noise_generator.eval_2d((x as f64 * scale) * 1./2., (y as f64 * scale)*1./2.) as f32   
+                    + 0.25 * noise_generator.eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.) as f32
+                    + 0.1 * noise_generator.eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.) as f32).powf(2.).powf(0.5).powf(0.9) - 0.04 + (1.-d)/2.
+                    );
+                    // println!("{}", v1[v1.len()-1]);
+                }
+                all_elevations.push(v1);
+            }
+    
         }
         if is_key_down(KeyCode::L) {
             value_island += 1.;
@@ -179,6 +230,7 @@ async fn main() {
         draw_text(&format!("Island value (P down L up): {}",value_island),0.,20.,20.,BLACK);
     draw_text(&format!("Visual value (I up O down): {}",visual_value),0.,42.,20.,BLACK);
     draw_text(&format!("Seed value (Space): {}",seed),0.,64.,20.,BLACK);
+    draw_text(&format!("Island Scale (Y down U up): {}",scale),0.,84.,20.,BLACK);
         next_frame().await
     }
 }
