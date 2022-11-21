@@ -176,7 +176,7 @@ async fn main() {
             }
     
         }
-        draw_text(&format!("Isalnd value (P down L up): {}",value_island),0.,20.,20.,BLACK);
+        draw_text(&format!("Island value (P down L up): {}",value_island),0.,20.,20.,BLACK);
     draw_text(&format!("Visual value (I up O down): {}",visual_value),0.,42.,20.,BLACK);
     draw_text(&format!("Seed value (Space): {}",seed),0.,64.,20.,BLACK);
         next_frame().await
