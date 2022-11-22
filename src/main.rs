@@ -18,10 +18,10 @@ enum Biomes {
     Shallow, Deep,Water, Land, Sand, Mountain, Fertile, Ruggard, Snow
 }
 fn elevation_check(e: f32) -> Biomes{
-    if e < 0.30 {
+    if e < 0.10 {
         return Biomes::Deep
     }
-    else if e < 0.39 {
+    else if e < 0.35 {
         return Biomes::Water
     }
     else if e < 0.48 {
@@ -39,7 +39,7 @@ fn elevation_check(e: f32) -> Biomes{
     else if e < 1.4 {
         return Biomes::Ruggard;
     }
-    else if e < 2.2 {
+    else if e < 1.8 {
         return Biomes::Mountain
     }
     else {
@@ -88,7 +88,7 @@ async fn main() {
     println!("complete noise gen");
     loop {
 
-        clear_background(BLUE);
+        clear_background(DARKBLUE);
         if is_key_down(KeyCode::I) {
             visual_value += 1.;
         }
@@ -195,7 +195,7 @@ async fn main() {
                     Biomes::Deep => DEEP,
                     _ => SNOW, };
                     
-                if colour != BLUE {
+                if colour != DARKBLUE {
                     draw_rectangle(visual_value*x as f32, visual_value*y as f32, visual_value,visual_value,colour);
                 }
                
