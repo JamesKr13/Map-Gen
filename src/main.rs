@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use opensimplex_noise_rs::*;
+use opensimplex_noise_rs::OpenSimplexNoise;
 extern crate rand;
 use macroquad::color::Color;
 use rand::Rng;
@@ -26,7 +26,7 @@ enum Biomes {
 }
 fn elevation_check(e: f32) -> Biomes {
     if e < 0.10 {
-        return Biomes::Deep;
+        Biomes::Deep
     } else if e < 0.35 {
         return Biomes::Water;
     } else if e < 0.48 {
@@ -69,24 +69,24 @@ async fn main() {
         for x in 0..screen_width() as u32 {
             let nx = 2. * x as f32 / screen_width() - 1.;
             let ny = 2. * y as f32 / screen_height() - 1.;
-            let d = min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+            let d = min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
             v1.push(
-                (1. * noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                (1. * noise_generator.eval_2d(f64::from(x) * scale, f64::from(y) * scale) as f32
                     + 0.5
-                        * noise_generator.eval_2d((x as f64 * scale) * 2., (y as f64 * scale) * 2.)
+                        * noise_generator.eval_2d((f64::from(x) * scale) * 2., (f64::from(y) * scale) * 2.)
                             as f32
                     + 0.5
-                        * noise_generator.eval_2d((y as f64 * scale) * 2., (x as f64 * scale) * 2.)
+                        * noise_generator.eval_2d((f64::from(y) * scale) * 2., (f64::from(x) * scale) * 2.)
                             as f32
                     + 2. * noise_generator
-                        .eval_2d((x as f64 * scale) * 1. / 2., (y as f64 * scale) * 1. / 2.)
+                        .eval_2d((f64::from(x) * scale) * 1. / 2., (f64::from(y) * scale) * 1. / 2.)
                         as f32
                     + 0.25
-                        * noise_generator.eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.)
+                        * noise_generator.eval_2d((f64::from(x) * scale) * 4., (f64::from(y) * scale) * 4.)
                             as f32
                     + 0.1
                         * noise_generator
-                            .eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.)
+                            .eval_2d((f64::from(x) * scale) * 10., (f64::from(y) * scale) * 10.)
                             as f32)
                     .powf(2.)
                     .powf(0.5)
@@ -122,8 +122,8 @@ async fn main() {
     loop {
         clear_background(SKYBLUE);
         set_camera(&Camera3D {
-            position: position,
-            up: up,
+            position,
+            up,
             target: position + front,
             ..Default::default()
         });
@@ -135,10 +135,8 @@ async fn main() {
         if is_key_down(KeyCode::I) {
             visual_value += 1.;
         }
-        if is_key_down(KeyCode::O) {
-            if visual_value != 1. {
-                visual_value -= 1.;
-            }
+        if is_key_down(KeyCode::O) && visual_value != 1. {
+            visual_value -= 1.;
         }
         if is_key_down(KeyCode::P) {
             value_island -= 1.;
@@ -146,13 +144,13 @@ async fn main() {
                 for x in 0..(800. / visual_value) as u32 {
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
-                    let d = min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt())
+                    let d = min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt())
                         * (value_island + 1.);
                     all_elevations[y as usize][x as usize] -= (1. - d) / 2.;
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
                     let d =
-                        min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+                        min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
                     all_elevations[y as usize][x as usize] += (1. - d) / 2.;
                 }
             }
@@ -168,27 +166,27 @@ async fn main() {
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
                     let d =
-                        min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+                        min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
                     v1.push(
-                        (1. * noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                        (1. * noise_generator.eval_2d(f64::from(x) * scale, f64::from(y) * scale) as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 2., (y as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(x) * scale) * 2., (f64::from(y) * scale) * 2.)
                                     as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((y as f64 * scale) * 2., (x as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(y) * scale) * 2., (f64::from(x) * scale) * 2.)
                                     as f32
                             + 2. * noise_generator
-                                .eval_2d((x as f64 * scale) * 1. / 2., (y as f64 * scale) * 1. / 2.)
+                                .eval_2d((f64::from(x) * scale) * 1. / 2., (f64::from(y) * scale) * 1. / 2.)
                                 as f32
                             + 0.25
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.)
+                                    .eval_2d((f64::from(x) * scale) * 4., (f64::from(y) * scale) * 4.)
                                     as f32
                             + 0.1
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.)
+                                    .eval_2d((f64::from(x) * scale) * 10., (f64::from(y) * scale) * 10.)
                                     as f32)
                             .powf(2.)
                             .powf(0.5)
@@ -212,27 +210,27 @@ async fn main() {
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
                     let d =
-                        min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+                        min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
                     v1.push(
-                        (1. * noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                        (1. * noise_generator.eval_2d(f64::from(x) * scale, f64::from(y) * scale) as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 2., (y as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(x) * scale) * 2., (f64::from(y) * scale) * 2.)
                                     as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((y as f64 * scale) * 2., (x as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(y) * scale) * 2., (f64::from(x) * scale) * 2.)
                                     as f32
                             + 2. * noise_generator
-                                .eval_2d((x as f64 * scale) * 1. / 2., (y as f64 * scale) * 1. / 2.)
+                                .eval_2d((f64::from(x) * scale) * 1. / 2., (f64::from(y) * scale) * 1. / 2.)
                                 as f32
                             + 0.25
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.)
+                                    .eval_2d((f64::from(x) * scale) * 4., (f64::from(y) * scale) * 4.)
                                     as f32
                             + 0.1
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.)
+                                    .eval_2d((f64::from(x) * scale) * 10., (f64::from(y) * scale) * 10.)
                                     as f32)
                             .powf(2.)
                             .powf(0.5)
@@ -252,13 +250,13 @@ async fn main() {
                 for x in 0..(800. / visual_value) as u32 {
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
-                    let d = min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt())
+                    let d = min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt())
                         * (value_island - 1.);
                     all_elevations[y as usize][x as usize] -= (1. - d) / 2.;
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
                     let d =
-                        min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+                        min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
                     all_elevations[y as usize][x as usize] += (1. - d) / 2.;
                 }
             }
@@ -276,27 +274,27 @@ async fn main() {
                     let nx = 2. * x as f32 / screen_width() - 1.;
                     let ny = 2. * y as f32 / screen_height() - 1.;
                     let d =
-                        min(1., (nx.powf(2.) + ny.powf(2.)) / (2. as f32).sqrt()) * value_island;
+                        min(1., (nx.powf(2.) + ny.powf(2.)) / 2_f32.sqrt()) * value_island;
                     v1.push(
-                        (1. * noise_generator.eval_2d(x as f64 * scale, y as f64 * scale) as f32
+                        (1. * noise_generator.eval_2d(f64::from(x) * scale, f64::from(y) * scale) as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 2., (y as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(x) * scale) * 2., (f64::from(y) * scale) * 2.)
                                     as f32
                             + 0.5
                                 * noise_generator
-                                    .eval_2d((y as f64 * scale) * 2., (x as f64 * scale) * 2.)
+                                    .eval_2d((f64::from(y) * scale) * 2., (f64::from(x) * scale) * 2.)
                                     as f32
                             + 2. * noise_generator
-                                .eval_2d((x as f64 * scale) * 1. / 2., (y as f64 * scale) * 1. / 2.)
+                                .eval_2d((f64::from(x) * scale) * 1. / 2., (f64::from(y) * scale) * 1. / 2.)
                                 as f32
                             + 0.25
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 4., (y as f64 * scale) * 4.)
+                                    .eval_2d((f64::from(x) * scale) * 4., (f64::from(y) * scale) * 4.)
                                     as f32
                             + 0.1
                                 * noise_generator
-                                    .eval_2d((x as f64 * scale) * 10., (y as f64 * scale) * 10.)
+                                    .eval_2d((f64::from(x) * scale) * 10., (f64::from(y) * scale) * 10.)
                                     as f32)
                             .powf(2.)
                             .powf(0.5)
@@ -399,28 +397,28 @@ async fn main() {
 
         set_default_camera();
         draw_text(
-            &format!("Island value (P down L up): {}", value_island),
+            &format!("Island value (P down L up): {value_island}"),
             0.,
             20.,
             20.,
             BLACK,
         );
         draw_text(
-            &format!("Visual value (I up O down): {}", visual_value),
+            &format!("Visual value (I up O down): {visual_value}"),
             0.,
             42.,
             20.,
             BLACK,
         );
         draw_text(
-            &format!("Seed value (Space): {}", seed),
+            &format!("Seed value (Space): {seed}"),
             0.,
             64.,
             20.,
             BLACK,
         );
         draw_text(
-            &format!("Island Scale (Y down U up): {}", scale),
+            &format!("Island Scale (Y down U up): {scale}"),
             0.,
             84.,
             20.,
